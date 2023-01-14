@@ -18,12 +18,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	for {
+	receiveTCPConnection(l)
+}
+
+func receiveTCPConnection(l net.Listener){
 		conn, err := l.Accept()
 		if err != nil {
 			fmt.Println("Error accepting connection: ", err.Error())
 			os.Exit(1)
 		}
+		redisHandler(conn)
+}
+
+func redisHandler(conn net.Conn) {
+	defer conn.Close()
+	for {
 		go conn.Write([]byte("+PONG\r\n"))
 	}
 }
