@@ -3,13 +3,11 @@ package main
 import (
 	"fmt"
 	"io"
-	// Uncomment this block to pass the first stage
 	"net"
 	"os"
 )
 
 func main() {
-	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	fmt.Println("Logs from your program will appear here!")
 
 	// リッスンの開始
@@ -32,7 +30,7 @@ func createRedisRequestReceiver(l net.Listener){
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
 	}
-	// 接続を閉じる。receiveTCPConnection関数の終了時に実行される。
+	// 接続を閉じる。createRedisRequestReceiver関数の終了時に実行される。
 	defer conn.Close()
 	redisHandler(conn)
 }
@@ -44,7 +42,7 @@ func redisHandler(conn net.Conn){
 		buf := make([]byte, 1024)
 		// コネクションからデータを読み取る
 		fmt.Println(1)
-		_, err := conn.Read(buf)
+		r, err := conn.Read(buf)
 		fmt.Println(2)
 		if err == io.EOF {
 			fmt.Println("Connection closed")
@@ -53,6 +51,12 @@ func redisHandler(conn net.Conn){
 		if err != nil {
 			fmt.Println("Error reading:", err.Error())
 		}
+
+		_, err = conn.Write(buf[:r])
+		if err != nil {
+			fmt.Println("Error writing:", err.Error())
+		}
+
 		writeResponse(conn)
 	}
 }
