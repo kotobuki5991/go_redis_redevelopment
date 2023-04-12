@@ -1,15 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
-	// Uncomment this block to pass the first stage
 	"net"
 	"os"
+	"strconv"
 )
 
 func main() {
-	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	fmt.Println("Logs from your program will appear here!")
 
 	// リッスンの開始
@@ -32,20 +32,17 @@ func createRedisRequestReceiver(l net.Listener){
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
 	}
-	// 接続を閉じる。receiveTCPConnection関数の終了時に実行される。
+	// 接続を閉じる。createRedisRequestReceiver関数の終了時に実行される。
 	defer conn.Close()
 	redisHandler(conn)
 }
 
-func redisHandler(conn net.Conn){
-	fmt.Println("call redisHandler")
 
+func redisHandler(conn net.Conn){
+	input := make([]byte, 1024)
 	for {
-		buf := make([]byte, 1024)
 		// コネクションからデータを読み取る
-		fmt.Println(1)
-		_, err := conn.Read(buf)
-		fmt.Println(2)
+		_, err := conn.Read(input)
 		if err == io.EOF {
 			fmt.Println("Connection closed")
 			break
@@ -53,8 +50,40 @@ func redisHandler(conn net.Conn){
 		if err != nil {
 			fmt.Println("Error reading:", err.Error())
 		}
+
+		checkCmd(input)
 		writeResponse(conn)
 	}
+}
+
+// RESP arrayのフォーマットからコマンドを解析する
+// *2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n
+// *の次の数値がRESP arrayの要素数
+// 1つ目$の次の数値が1つ目の値の文字数（ここでは$4なのでECHOの4文字）
+// 2つ目の$の次の数値が2つ目の値の文字数（ここでは$3なのでheyの3文字）
+func checkCmd(input []byte){
+	respAryLength, err := strconv.Atoi(string(input[1:2]))
+	fmt.Println(input[1:2])
+	if err != nil {
+		fmt.Println("RESP Array format invalid", err.Error())
+	}
+	fmt.Println(respAryLength)
+	cmdLength, err := strconv.Atoi(string(input[3:4]))
+	fmt.Println(input[3:4])
+	if err != nil {
+		fmt.Println("RESP Array format invalid", err.Error())
+	}
+	fmt.Println(cmdLength)
+}
+
+
+// *2\r\n$4\r\nECHO\r\n$3\r\nhey\r\nを受け取った場合
+func isEchoCmd(b []byte){
+	artIndex := bytes.Index(b, []byte("\r\n"))
+	// "\r\n"が存在しない場合処理終了
+	if artIndex == -1 {return}
+	// 区切り文字で分轄
+	// slice := bytes.Split(b, []byte("\r\n"))
 }
 
 func writeResponse(conn net.Conn) {
