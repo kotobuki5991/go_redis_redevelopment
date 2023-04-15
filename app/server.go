@@ -5,7 +5,9 @@ import (
 	"io"
 	"net"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 )
 
 var CRLF = "\r\n"
@@ -74,8 +76,9 @@ func getCmdAndArg(input []byte) RedisRequest{
 	command := ""
 	args := make([]string, 0)
 	for i := 1; i < respAryLength; i++ {
-		fmt.Println(i)
+		fmt.Println("--------------")
 		fmt.Println(inputRespAry[i])
+		fmt.Println("--------------")
 		if strings.Index(inputRespAry[i], "$") != -1 {continue}
 
 		if i == 2 {
@@ -96,53 +99,86 @@ func getCmdAndArg(input []byte) RedisRequest{
 func writeResponse(conn net.Conn, redisRequest RedisRequest) {
 	fmt.Println("writeResponse")
 	cmd := redisRequest.command
+	fmt.Println("command")
+	fmt.Println(cmd)
+	fmt.Println("command")
 	args := redisRequest.args
 	// コネクションにデータを書き込む
+	resp := make([]byte, 0)
 	switch cmd {
 	case "echo":
-		echoCmdHandler(conn, args[0])
+		resp = append(resp, echoCmdHandler(conn, args[0])...)
 	case "ping":
-		pingCmdHandler(conn)
+		resp = append(resp, pingCmdHandler(conn)...)
 	case "set":
-		setCmdHandler(conn, KeyVal{key: args[0], value: args[1]})
+		resp = append(resp, setCmdHandler(conn, args)...)
 	case "get":
 		searchKey := args[0]
-		getCmdHandler(conn, searchKey)
+		resp = append(resp, getCmdHandler(conn, searchKey)...)
 	default:
 		fmt.Println("command invalid. your command is ", cmd)
 	}
+	conn.Write(resp)
+	fmt.Println("=======================")
 }
 
-func echoCmdHandler(conn net.Conn, args string){
-	conn.Write([]byte(fmt.Sprint("$", len(args), CRLF, args, CRLF)))
+func echoCmdHandler(conn net.Conn, args string) []byte{
+	return []byte(fmt.Sprint("$", len(args), CRLF, args, CRLF))
 }
 
-func pingCmdHandler(conn net.Conn){
-	conn.Write([]byte("+PONG\r\n"))
+func pingCmdHandler(conn net.Conn) []byte{
+	return []byte("+PONG\r\n")
 }
 
 type KeyVal struct {
 	key string
 	value string
+	expiredDayTime *time.Time //初期値nil
 }
 
 var keyVals []KeyVal
 
-func setCmdHandler(conn net.Conn, keyVal KeyVal){
+func setCmdHandler(conn net.Conn, args []string) []byte{
+	keyVal := KeyVal{key: args[0], value: args[1]}
+	if len(args) == 4 {
+		op := args[2]
+		opVal, err := strconv.Atoi(args[3])
+		if err != nil {
+			fmt.Println("PXオプションはmillisecondを数値で入力してください")
+			fmt.Println(args[3])
+		}
+
+		if op == "px" {
+			expiredTime := time.Now().Add(time.Duration(opVal) * time.Millisecond)
+			keyVal.expiredDayTime = &expiredTime
+		}
+	}
+
 	keyVals = append(keyVals, keyVal)
-	conn.Write([]byte(fmt.Sprint("$", 2, CRLF, "OK", CRLF)))
+	return []byte(fmt.Sprint("$", 2, CRLF, "OK", CRLF))
 }
 
-func getCmdHandler(conn net.Conn, key string){
+func getCmdHandler(conn net.Conn, key string) []byte{
 	resp := findValueByKey(key)
-	conn.Write([]byte(fmt.Sprint("$", len(resp), CRLF, resp, CRLF)))
+	fmt.Println("resp")
+	fmt.Println(resp)
+	fmt.Println("resp")
+	return []byte(fmt.Sprint("$", len(resp), CRLF, resp, CRLF))
 }
 
 func findValueByKey(key string) string {
 	for _, elem := range keyVals {
 			if elem.key == key {
-					return elem.value
+				now := time.Now()
+				fmt.Println("check isExpierd")
+				if elem.expiredDayTime != nil && now.After(*elem.expiredDayTime) {
+					fmt.Println("Expierd")
+					return "$-1\r\n" // null bulk stringを返す
+				}
+				fmt.Println("not Expierd")
+				fmt.Println(elem)
+				return elem.value
 			}
 	}
-	return "OK" // keyが見つからなかった場合
+	return "" // keyが見つからなかった場合
 }
