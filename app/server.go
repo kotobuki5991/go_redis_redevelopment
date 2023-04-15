@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-var crlf = "\r\n"
+var CRLF = "\r\n"
 
 func main() {
 	fmt.Println("Logs from your program will appear here!")
@@ -62,13 +62,13 @@ type RedisRequest struct {
 	args []string
 }
 
-// RESP arrayのフォーマットからコマンドを解析する
+// RESP arrayのフォーマットからコマンドと引数を解析する
 // *2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n
 // *の次の数値がRESP arrayの要素数
 // 1つ目$の次の数値が1つ目の値の文字数（ここでは$4なのでECHOの4文字）
 // 2つ目の$の次の数値が2つ目の値の文字数（ここでは$3なのでheyの3文字）
 func getCmdAndArg(input []byte) RedisRequest{
-	inputRespAry := strings.Split(string(input), crlf)
+	inputRespAry := strings.Split(string(input), CRLF)
 	respAryLength := len(inputRespAry)
 
 	command := ""
@@ -100,10 +100,49 @@ func writeResponse(conn net.Conn, redisRequest RedisRequest) {
 	// コネクションにデータを書き込む
 	switch cmd {
 	case "echo":
-		conn.Write([]byte(fmt.Sprint("$", len(args[0]), crlf, args[0], crlf)))
+		echoCmdHandler(conn, args[0])
 	case "ping":
-		conn.Write([]byte("+PONG\r\n"))
+		pingCmdHandler(conn)
+	case "set":
+		setCmdHandler(conn, KeyVal{key: args[0], value: args[1]})
+	case "get":
+		searchKey := args[0]
+		getCmdHandler(conn, searchKey)
 	default:
 		fmt.Println("command invalid. your command is ", cmd)
 	}
+}
+
+func echoCmdHandler(conn net.Conn, args string){
+	conn.Write([]byte(fmt.Sprint("$", len(args), CRLF, args, CRLF)))
+}
+
+func pingCmdHandler(conn net.Conn){
+	conn.Write([]byte("+PONG\r\n"))
+}
+
+type KeyVal struct {
+	key string
+	value string
+}
+
+var keyVals []KeyVal
+
+func setCmdHandler(conn net.Conn, keyVal KeyVal){
+	keyVals = append(keyVals, keyVal)
+	conn.Write([]byte(fmt.Sprint("$", 2, CRLF, "OK", CRLF)))
+}
+
+func getCmdHandler(conn net.Conn, key string){
+	resp := findValueByKey(key)
+	conn.Write([]byte(fmt.Sprint("$", len(resp), CRLF, resp, CRLF)))
+}
+
+func findValueByKey(key string) string {
+	for _, elem := range keyVals {
+			if elem.key == key {
+					return elem.value
+			}
+	}
+	return "OK" // keyが見つからなかった場合
 }
