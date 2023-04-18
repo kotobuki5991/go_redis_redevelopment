@@ -1,9 +1,8 @@
-package cmd
+package main
 
 import (
 	"fmt"
 	"net"
-	"myredis/consts"
 )
 
 type PingCommand struct {}
@@ -18,5 +17,5 @@ func NewPingInstance() Command {
 }
 
 func (this *PingCommand)Exec(conn net.Conn, args []string) []byte {
-	return []byte(fmt.Sprint("+PONG", consts.CRLF))
+	return []byte(fmt.Sprint("+PONG", CRLF))
 }

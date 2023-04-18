@@ -1,9 +1,8 @@
-package cmd
+package main
 
 import (
 	"fmt"
 	"net"
-	"myredis/consts"
 )
 
 type EchoCommand struct {}
@@ -18,5 +17,5 @@ func NewEchoInstance() Command {
 }
 
 func (this *EchoCommand)Exec(conn net.Conn, args []string) []byte {
-	return []byte(fmt.Sprint("$", len(args), consts.CRLF, args[0], consts.CRLF))
+	return []byte(fmt.Sprint("$", len(args), CRLF, args[0], CRLF))
 }

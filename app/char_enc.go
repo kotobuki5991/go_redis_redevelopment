@@ -1,3 +1,3 @@
-package consts
+package main
 
 var CRLF = "\r\n"

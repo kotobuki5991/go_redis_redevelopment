@@ -1,8 +1,7 @@
-package cmd
+package main
 
 import (
 	"fmt"
-	"myredis/consts"
 	"net"
 	"strconv"
 	"time"
@@ -51,5 +50,5 @@ func (this *SetCommand)Exec(conn net.Conn, args []string) []byte {
 	}
 
 	keyVals = append(keyVals, keyVal)
-	return []byte(fmt.Sprint("$", 2, consts.CRLF, "OK", consts.CRLF))
+	return []byte(fmt.Sprint("$", 2, CRLF, "OK", CRLF))
 }

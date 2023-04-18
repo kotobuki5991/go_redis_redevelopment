@@ -1,8 +1,7 @@
-package cmd
+package main
 
 import (
 	"fmt"
-	"myredis/consts"
 	"net"
 	"time"
 )
@@ -24,7 +23,7 @@ func (this *GetCommand)Exec(conn net.Conn, args []string) []byte {
 	if (resp == nil){
 		return []byte("$-1\r\n")
 	}
-	return []byte(fmt.Sprint("$", len(*resp), consts.CRLF, *resp, consts.CRLF))
+	return []byte(fmt.Sprint("$", len(*resp), CRLF, *resp, CRLF))
 }
 
 func (this *GetCommand)findValueByKey(key string) *string {
