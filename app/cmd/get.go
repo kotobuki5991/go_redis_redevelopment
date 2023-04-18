@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"myredis/consts"
+	"app/consts"
 	"net"
 	"time"
 )

@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"net"
-	"myredis/consts"
+	"app/consts"
 )
 
 type EchoCommand struct {}
