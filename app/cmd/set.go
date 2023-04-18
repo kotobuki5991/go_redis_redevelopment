@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"myredis/consts"
+	"github.com/kotobuki5991/go_redis_redevelopment/consts"
 	"net"
 	"strconv"
 	"time"

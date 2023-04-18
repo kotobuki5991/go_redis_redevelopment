@@ -8,8 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"myredis/cmd"
-	"myredis/consts"
+	"github.com/kotobuki5991/go_redis_redevelopment/cmd"
+	"github.com/kotobuki5991/go_redis_redevelopment/consts"
 )
 
 func main() {

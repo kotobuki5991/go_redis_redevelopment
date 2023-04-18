@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"net"
-	"myredis/consts"
+	"github.com/kotobuki5991/go_redis_redevelopment/consts"
 )
 
 type EchoCommand struct {}
