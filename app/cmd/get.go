@@ -1,8 +1,9 @@
-package main
+package cmd
 
 import (
 	"fmt"
 	"time"
+	"github.com/kotobuki5991/go_redis_redevelopment/app/consts"
 )
 
 type GetCommand struct {}
@@ -16,16 +17,16 @@ func NewGetInstance() Command {
 	return getInstance
 }
 
-func (this *GetCommand)Exec(args []string) []byte {
+func (cmd *GetCommand)Exec(args []string) []byte {
 	searchKey := args[0]
-	resp := this.findValueByKey(searchKey)
+	resp := cmd.findValueByKey(searchKey)
 	if (resp == nil){
 		return []byte("$-1\r\n")
 	}
-	return []byte(fmt.Sprint("$", len(*resp), CRLF, *resp, CRLF))
+	return []byte(fmt.Sprint("$", len(*resp), consts.CRLF, *resp, consts.CRLF))
 }
 
-func (this *GetCommand)findValueByKey(key string) *string {
+func (cmd *GetCommand)findValueByKey(key string) *string {
 	for _, elem := range keyVals {
 			if elem.key == key {
 				now := time.Now()

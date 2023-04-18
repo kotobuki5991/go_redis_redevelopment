@@ -1,9 +1,10 @@
-package main
+package cmd
 
 import (
 	"fmt"
 	"strconv"
 	"time"
+	"github.com/kotobuki5991/go_redis_redevelopment/app/consts"
 )
 
 type KeyVal struct {
@@ -26,7 +27,7 @@ func NewSetInstance() Command {
 	return setInstance
 }
 
-func (this *SetCommand)Exec(args []string) []byte {
+func (cmd *SetCommand)Exec(args []string) []byte {
 
 	keyVal := KeyVal{key: args[0], value: args[1]}
 
@@ -49,5 +50,5 @@ func (this *SetCommand)Exec(args []string) []byte {
 	}
 
 	keyVals = append(keyVals, keyVal)
-	return []byte(fmt.Sprint("$", 2, CRLF, "OK", CRLF))
+	return []byte(fmt.Sprint("$", 2, consts.CRLF, "OK", consts.CRLF))
 }

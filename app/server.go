@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"github.com/kotobuki5991/go_redis_redevelopment/app/cmd"
+	"github.com/kotobuki5991/go_redis_redevelopment/app/consts"
 )
 
 func main() {
@@ -83,7 +85,7 @@ type RedisRequest struct {
 // 1つ目$の次の数値が1つ目の値の文字数（ここでは$4なのでECHOの4文字）
 // 2つ目の$の次の数値が2つ目の値の文字数（ここでは$3なのでheyの3文字）
 func getCmdAndArg(input []byte) RedisRequest{
-	inputRespAry := strings.Split(string(input), CRLF)
+	inputRespAry := strings.Split(string(input), consts.CRLF)
 	respAryLength := len(inputRespAry)
 
 	command := ""
@@ -117,17 +119,17 @@ func writeResponse(conn net.Conn, redisRequest RedisRequest) {
 	conn.Write(resp)
 }
 
-func getCmdInstance(cmdName string) Command {
-	var command Command
+func getCmdInstance(cmdName string) cmd.Command {
+	var command cmd.Command
 	switch cmdName {
 	case "ping":
-		command = NewPingInstance()
+		command = cmd.NewPingInstance()
 	case "echo":
-		command = NewEchoInstance()
+		command = cmd.NewEchoInstance()
 	case "set":
-		command = NewSetInstance()
+		command = cmd.NewSetInstance()
 	case "get":
-		command = NewGetInstance()
+		command = cmd.NewGetInstance()
 	default:
 		fmt.Println("command invalid. your command is ", cmdName)
 	}

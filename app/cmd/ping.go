@@ -1,7 +1,8 @@
-package main
+package cmd
 
 import (
 	"fmt"
+	"github.com/kotobuki5991/go_redis_redevelopment/app/consts"
 )
 
 type PingCommand struct {}
@@ -15,6 +16,6 @@ func NewPingInstance() Command {
 	return pingInstance
 }
 
-func (this *PingCommand)Exec(args []string) []byte {
-	return []byte(fmt.Sprint("+PONG", CRLF))
+func (cmd *PingCommand)Exec(args []string) []byte {
+	return []byte(fmt.Sprint("+PONG", consts.CRLF))
 }
