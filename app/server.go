@@ -7,9 +7,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-
-	"myredis/cmd"
-	"myredis/consts"
 )
 
 func main() {
@@ -86,7 +83,7 @@ type RedisRequest struct {
 // 1つ目$の次の数値が1つ目の値の文字数（ここでは$4なのでECHOの4文字）
 // 2つ目の$の次の数値が2つ目の値の文字数（ここでは$3なのでheyの3文字）
 func getCmdAndArg(input []byte) RedisRequest{
-	inputRespAry := strings.Split(string(input), consts.CRLF)
+	inputRespAry := strings.Split(string(input), CRLF)
 	respAryLength := len(inputRespAry)
 
 	command := ""
@@ -120,17 +117,17 @@ func writeResponse(conn net.Conn, redisRequest RedisRequest) {
 	conn.Write(resp)
 }
 
-func getCmdInstance(cmdName string) cmd.Command {
-	var command cmd.Command
+func getCmdInstance(cmdName string) Command {
+	var command Command
 	switch cmdName {
 	case "echo":
-		command = cmd.NewEchoInstance()
+		command = NewEchoInstance()
 	case "ping":
-		command = cmd.NewPingInstance()
+		command = NewPingInstance()
 	case "set":
-		command = cmd.NewSetInstance()
+		command = NewSetInstance()
 	case "get":
-		command = cmd.NewGetInstance()
+		command = NewGetInstance()
 	default:
 		fmt.Println("command invalid. your command is ", cmdName)
 	}
@@ -138,7 +135,7 @@ func getCmdInstance(cmdName string) cmd.Command {
 }
 
 // func echoCmdHandler(conn net.Conn, args string) []byte{
-// 	return []byte(fmt.Sprint("$", len(args), consts.CRLF, args, consts.CRLF))
+// 	return []byte(fmt.Sprint("$", len(args), CRLF, args, CRLF))
 // }
 
 // func pingCmdHandler(conn net.Conn) []byte{
@@ -175,7 +172,7 @@ func getCmdInstance(cmdName string) cmd.Command {
 // 	}
 
 // 	keyVals = append(keyVals, keyVal)
-// 	return []byte(fmt.Sprint("$", 2, consts.CRLF, "OK", consts.CRLF))
+// 	return []byte(fmt.Sprint("$", 2, CRLF, "OK", CRLF))
 // }
 
 // func getCmdHandler(conn net.Conn, key string) []byte{
@@ -183,7 +180,7 @@ func getCmdInstance(cmdName string) cmd.Command {
 // 	if (resp == nil){
 // 		return []byte("$-1\r\n")
 // 	}
-// 	return []byte(fmt.Sprint("$", len(*resp), consts.CRLF, *resp, consts.CRLF))
+// 	return []byte(fmt.Sprint("$", len(*resp), CRLF, *resp, CRLF))
 // }
 
 // func findValueByKey(key string) *string {
