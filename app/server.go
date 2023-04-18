@@ -91,7 +91,7 @@ func getCmdAndArg(input []byte) RedisRequest{
 	command := ""
 	args := make([]string, 0)
 	for i := 1; i < respAryLength; i++ {
-		if strings.Index(inputRespAry[i], "$") != -1 {continue}
+		if strings.Contains(inputRespAry[i], "$") {continue}
 
 		if i == 2 {
 			// コマンドを取得
