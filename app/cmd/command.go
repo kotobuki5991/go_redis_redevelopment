@@ -3,5 +3,5 @@ package cmd
 import "net"
 
 type Command interface {
-	exec(conn net.Conn)
+	Exec(conn net.Conn, args []string) []byte
 }
