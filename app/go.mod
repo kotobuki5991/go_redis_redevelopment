@@ -1,3 +1,3 @@
-module myredis
+module app
 
 go 1.18

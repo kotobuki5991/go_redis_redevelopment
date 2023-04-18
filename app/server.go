@@ -8,8 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"myredis/cmd"
-	"myredis/consts"
+	"cmd"
+	"consts"
 )
 
 func main() {
