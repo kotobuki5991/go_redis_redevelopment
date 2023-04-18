@@ -1,12 +1,22 @@
 package cmd
 
-// import (
-// 	"fmt"
-// 	"net"
-// )
+import (
+	"fmt"
+	"net"
+	"myredis/consts"
+)
 
-// type EchoCmmand struct {}
+type EchoCommand struct {}
 
-// func (c EchoCmmand)exec(conn net.Conn, args string){
-// 	conn.Write([]byte(fmt.Sprint("$", len(args), main.CRLF, args, crlf)))
-// }
+var echoInstance Command
+
+func NewEchoInstance() Command {
+	if echoInstance == nil {
+		echoInstance = &EchoCommand{}
+	}
+	return echoInstance
+}
+
+func (this *EchoCommand)Exec(conn net.Conn, args []string) []byte {
+	return []byte(fmt.Sprint("$", len(args), consts.CRLF, args[0], consts.CRLF))
+}
