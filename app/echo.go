@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net"
 )
 
 type EchoCommand struct {}
@@ -16,6 +15,6 @@ func NewEchoInstance() Command {
 	return echoInstance
 }
 
-func (this *EchoCommand)Exec(conn net.Conn, args []string) []byte {
+func (this *EchoCommand)Exec(args []string) []byte {
 	return []byte(fmt.Sprint("$", len(args), CRLF, args[0], CRLF))
 }
