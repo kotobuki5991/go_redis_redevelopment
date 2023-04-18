@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net"
 	"strconv"
 	"time"
 )
@@ -27,7 +26,7 @@ func NewSetInstance() Command {
 	return setInstance
 }
 
-func (this *SetCommand)Exec(conn net.Conn, args []string) []byte {
+func (this *SetCommand)Exec(args []string) []byte {
 
 	keyVal := KeyVal{key: args[0], value: args[1]}
 
