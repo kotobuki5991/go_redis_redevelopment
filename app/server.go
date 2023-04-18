@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -23,8 +24,25 @@ func main() {
 		os.Exit(1)
 	}
 
+		// ゴルーチンプールの設定
+		poolSize := 5
+		pool := make(chan struct{}, poolSize)
+		for i := 0; i < poolSize; i++ {
+			pool <- struct{}{}
+		}
+
+	// ゴルーチンプールで接続を処理する
+	var wg sync.WaitGroup
 	for {
-		go createRedisRequestReceiver(l)
+		// goroutineプールに空きがなければ待機する
+		<-pool
+		wg.Add(1)
+		go func() {
+			createRedisRequestReceiver(l)
+			wg.Done()
+			// 処理が完了したらgoroutineをプールに戻す
+			pool <- struct{}{}
+		}()
 	}
 }
 
@@ -39,7 +57,6 @@ func createRedisRequestReceiver(l net.Listener){
 	defer conn.Close()
 	redisHandler(conn)
 }
-
 
 func redisHandler(conn net.Conn){
 	input := make([]byte, 1024)
