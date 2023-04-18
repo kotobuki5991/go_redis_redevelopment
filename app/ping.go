@@ -17,5 +17,6 @@ func NewPingInstance() Command {
 }
 
 func (this *PingCommand)Exec(conn net.Conn, args []string) []byte {
+	fmt.Println("call ping")
 	return []byte(fmt.Sprint("+PONG", CRLF))
 }
