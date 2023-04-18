@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net"
 	"time"
 )
 
@@ -17,7 +16,7 @@ func NewGetInstance() Command {
 	return getInstance
 }
 
-func (this *GetCommand)Exec(conn net.Conn, args []string) []byte {
+func (this *GetCommand)Exec(args []string) []byte {
 	searchKey := args[0]
 	resp := this.findValueByKey(searchKey)
 	if (resp == nil){
