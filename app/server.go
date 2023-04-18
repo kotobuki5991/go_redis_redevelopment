@@ -113,6 +113,7 @@ func writeResponse(conn net.Conn, redisRequest RedisRequest) {
 	resp := make([]byte, 0)
 	// コマンド名に応じたインスタンスを取得
 	cmdInstance := getCmdInstance(cmd)
+	fmt.Println(string(cmdInstance.Exec(conn, args)))
 	resp = append(resp, cmdInstance.Exec(conn, args)...)
 	conn.Write(resp)
 }
