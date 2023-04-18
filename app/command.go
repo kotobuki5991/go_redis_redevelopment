@@ -1,7 +1,5 @@
 package main
 
-import "net"
-
 type Command interface {
-	Exec(conn net.Conn, args []string) []byte
+	Exec(args []string) []byte
 }
