@@ -113,17 +113,19 @@ func writeResponse(conn net.Conn, redisRequest RedisRequest) {
 	resp := make([]byte, 0)
 	// コマンド名に応じたインスタンスを取得
 	cmdInstance := getCmdInstance(cmd)
-	resp = append(resp, cmdInstance.Exec(conn, args)...)
+	fmt.Println(string(cmdInstance.Exec(args)))
+	resp = append(resp, cmdInstance.Exec(args)...)
 	conn.Write(resp)
 }
 
 func getCmdInstance(cmdName string) Command {
 	var command Command
 	switch cmdName {
+	case "ping":
+		fmt.Println("ping!!!!")
+		command = NewPingInstance()
 	case "echo":
 		command = NewEchoInstance()
-	case "ping":
-		command = NewPingInstance()
 	case "set":
 		command = NewSetInstance()
 	case "get":
